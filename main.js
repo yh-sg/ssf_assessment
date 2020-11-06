@@ -31,7 +31,7 @@ const pool = mysql.createPool({
 
 // express and configure hbs
 const app = express()
-// app.use(morgan('combined'))
+app.use(morgan('combined'))
 app.engine('hbs', hbs({ defaultLayout: 'default.hbs' }))
 app.set('view engine', 'hbs')
 
@@ -92,6 +92,9 @@ app.get("/books/:letter",async(req,res)=>{
         })
     } catch (e) {
         console.log(e);
+        res.status(500)
+		res.type('text/html')
+		res.send(e)
     } finally {
         conn.release()
     }
@@ -110,14 +113,43 @@ app.get("/book/:bookid",async(req,res)=>{
         // console.log(bookresult.authors.replace(regex,","));
         bookresult.authors = bookresult.authors.replace(regex,", ")
         bookresult.genres = bookresult.genres.replace(regex,", ")
+        let bookJSformat = [bookresult].map((e)=>{
+            return {
+                bookId: e.book_id,
+                title: e.title,
+                authors: e.authors.split(", "),
+                summary: e.description,
+                pages: e.pages,
+                rating: e.rating,
+                ratingCount: e.rating_count,
+                genres: e.genres.split(", ")
+            }
+        })
         // console.log(bookresult);
         res.status(200)
-        res.type('text/html')
-        res.render('bookDetails',{
-            book: bookresult,
+        // res.type('text/html')
+        res.format({
+            'text/html' : () => {
+                res.type('text/html')
+                res.render('bookDetails',{book: bookresult})
+            },
+            'application/json': () => {
+                res.type('application/json')
+                res.json(bookJSformat)
+            },
+            'default': () => {
+                res.type('text/plain')
+                res.send(JSON.stringify(bookresult))
+            }
         })
+        // res.render('bookDetails',{
+        //     book: bookresult,
+        // })
     } catch (e) {
         console.log(e);
+        res.status(500)
+		res.type('text/html')
+		res.send(e)
     } finally {
         conn.release()
     }
@@ -166,7 +198,9 @@ app.post('/searchReview',express.urlencoded({extended: true}), async(req,res)=>{
 })
 
 app.use(express.static(__dirname + '/static')) 
-// app.use(express.static('static'));
+// app.use((req,res)=>{
+//     res.redirect('/')
+// })
 
 startApp(app,pool);
 
