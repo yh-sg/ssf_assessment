@@ -142,9 +142,6 @@ app.get("/book/:bookid",async(req,res)=>{
                 res.send(JSON.stringify(bookresult))
             }
         })
-        // res.render('bookDetails',{
-        //     book: bookresult,
-        // })
     } catch (e) {
         console.log(e);
         res.status(500)
@@ -203,4 +200,3 @@ app.use(express.static(__dirname + '/static'))
 // })
 
 startApp(app,pool);
-
