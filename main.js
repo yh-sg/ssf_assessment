@@ -4,13 +4,15 @@ const hbs = require('express-handlebars')
 const mysql = require('mysql2/promise')
 const fetch = require("node-fetch")
 const withQuery = require("with-query").default
+const morgan = require("morgan")
 
 //config PORT
-const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3000
+const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT)
 
 //SQL
 const SQL_SELECT_BOOKS_ALPHABET = 'select * from book2018 WHERE title LIKE ? limit ? offset ?'
 const SQL_FIND_BY_BOOK_ID = 'select * from book2018 where book_id = ?'
+const SQL_BOOKS_COUNT = 'select count(*) as book_count from book2018 where title LIKE ?'
 
 // reviews
 const URL = 'https://api.nytimes.com/svc/books/v3/reviews.json';
@@ -18,9 +20,9 @@ const API_KEY = process.env.API_KEY || '';
 
 // configure connection pool
 const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT) || 3306, 
-    database: process.env.DB_NAME || 'goodreads',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT), 
+    database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     connectionLimit: 4, 
@@ -29,11 +31,10 @@ const pool = mysql.createPool({
 
 // express and configure hbs
 const app = express()
+// app.use(morgan('combined'))
 app.engine('hbs', hbs({ defaultLayout: 'default.hbs' }))
 app.set('view engine', 'hbs')
 
-app.use(express.static(__dirname + '/static')) 
-app.use(express.urlencoded({extended: true}))
 
 const startApp = async(app,pool) => {
     try{
@@ -55,7 +56,6 @@ const startApp = async(app,pool) => {
 }
 
 app.get('/',async(req,res)=>{
-    // const conn = await pool.getConnection()
 
     try {
             res.status(200)
@@ -76,7 +76,10 @@ app.get("/books/:letter",async(req,res)=>{
 
     try {
         let result = await conn.query(SQL_SELECT_BOOKS_ALPHABET,[`${req.params.letter}%`, limit, offset])
+        let count = await conn.query(SQL_BOOKS_COUNT,[`${req.params.letter}%`])
         // console.log(result[0]);
+        // console.log(count[0][0].book_count);
+        let bookCount = count[0][0].book_count;
         res.status(200)
         res.type('text/html')
         res.render('books',{
@@ -84,7 +87,8 @@ app.get("/books/:letter",async(req,res)=>{
             letter: req.params.letter,
             prevOffset: Math.max(0, offset - limit),
             nextOffset: offset + limit,
-            empty: result[0].length<=0
+            empty: offset<=0,
+            max: (bookCount-offset)<=10,
         })
     } catch (e) {
         console.log(e);
@@ -98,14 +102,19 @@ app.get("/book/:bookid",async(req,res)=>{
     const conn = await pool.getConnection()
 
     try {
-    
         /************************************/
         let result = await conn.query(SQL_FIND_BY_BOOK_ID, [req.params.bookid])
         // console.log(result[0][0]);
+        let bookresult = result[0][0];
+        let regex = /[|]/g;
+        // console.log(bookresult.authors.replace(regex,","));
+        bookresult.authors = bookresult.authors.replace(regex,", ")
+        bookresult.genres = bookresult.genres.replace(regex,", ")
+        // console.log(bookresult);
         res.status(200)
         res.type('text/html')
         res.render('bookDetails',{
-            book: result[0][0],
+            book: bookresult,
         })
     } catch (e) {
         console.log(e);
@@ -146,7 +155,7 @@ app.post('/searchReview',express.urlencoded({extended: true}), async(req,res)=>{
         }
     })
 
-    console.log(bookReview);
+    // console.log(bookReview);
 
     res.status(200)
     res.type("text/html")
@@ -155,6 +164,9 @@ app.post('/searchReview',express.urlencoded({extended: true}), async(req,res)=>{
         empty: jsResult.results.length <=0
     })
 })
+
+app.use(express.static(__dirname + '/static')) 
+// app.use(express.static('static'));
 
 startApp(app,pool);
 

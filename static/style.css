@@ -1,7 +1,45 @@
-.reviewBtn{
+/* h1{
+    color:blue
+} */
+
+footer{
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.reviewUrl{
+    text-decoration: underline;
+    text-align: right;
+
+}
+
+.col{
+    width: 50%;
+}
+
+.review{
     background: none;
     border: none;
     color: blue;
     text-decoration: underline;
     cursor: pointer;
 }
+
+a.fill-div {
+    display: block;
+    color: green;
+}
+
+a.fill-div2 {
+    display: block;
+    color: black;
+}
+
+.text-center{
+    text-align: center;
+}
+
+.wrap{
+    word-wrap: break-word;
+}
+

@@ -7,7 +7,7 @@
             <div>Pages: {{book.pages}}</div>
             <div>Rating: {{book.rating}} ({{book.rating_count}})</div>
             <div>Genres: </div>
-            <div>{{book.genres}}</div>
+            <div class="wrap">{{book.genres}}</div>
     </div>
     <div class="col-8">
             <h1> {{book.title}}</h1>
@@ -16,7 +16,7 @@
             <form action="/searchReview" method="POST">
                     <input type="hidden" name="title" id="title" value="{{book.title}}">
                     <input type="hidden" name="author" id="author" value="{{book.authors}}">
-                    <button type="submit" class="reviewBtn">Find Review</button>
+                    <button type="submit" class="review">Find Review</button>
             </form>
     </div>
 </div>

@@ -1,27 +1,28 @@
 <a href="/">Home</a>
 <br>
 
-<h1>Letter {{letter}}</h1>
-
-{{#if empty}}
-    <h1>No result!</h1>
-    <a href="/">Back</a>
-{{else}}
+<h1 class="mt-3 mb-3">Letter {{letter}}</h1>
 
 {{#each book}}
     <li><a href="/book/{{this.book_id}}">{{this.title}}</a></li>
 {{/each}}
 
-<div class="d-flex flex-row bd-highlight mb-3 justify-content-between">
+<div class="d-flex flex-row bd-highlight mb-3 justify-content-between mt-3">
     <form action="/books/{{letter}}" method="get">
             <input type="hidden" name="offset" value={{prevOffset}}>
-            <button type="submit">Previous</button>
+            {{#if empty}}
+            <button type="submit" class="btn btn-primary" disabled>Previous</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary">Previous</button>
+            {{/if}}
     </form>
 
     <form action="/books/{{letter}}" method="get">
             <input type="hidden" name="offset" value={{nextOffset}}>
-            <button type="submit">Next</button>
+            {{#if max}}
+            <button type="submit" class="btn btn-primary" disabled>Next</button>
+            {{else}}
+            <button type="submit" class="btn btn-primary">Next</button>
+            {{/if}}
     </form>
 </div>
-
-{{/if}}
