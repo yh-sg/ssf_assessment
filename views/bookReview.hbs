@@ -1,0 +1,11 @@
+<a href="/">Home</a>
+<br>
+{{#each bookReview}}
+    <h1>{{this.title}}</h1>
+    <em><b>by: {{this.author}}</b></em>
+    <p>Reviewer: {{this.reviewer}}</p>
+    <p>Date: {{this.reviewDate}}</p>
+    <p>{{this.summary}}</p>
+    <a href={{reviewUrl}}>Full Review</a>
+    <footer>Copyright (c) 2020 The New York Times Company. All Rights Reserved</footer>
+{{/each}}

@@ -1,0 +1,22 @@
+<a href="/">Home</a>
+<br>
+
+<div class="row">
+    <div class="col-4">
+            <img src="{{book.image_url}}" alt="" class="img-fluid">
+            <div>Pages: {{book.pages}}</div>
+            <div>Rating: {{book.rating}} ({{book.rating_count}})</div>
+            <div>Genres: </div>
+            <div>{{book.genres}}</div>
+    </div>
+    <div class="col-8">
+            <h1> {{book.title}}</h1>
+            <em><b>by: {{book.authors}}</b></em>
+            <div class="mt-3 mb-3">{{book.description}}</div>
+            <form action="/searchReview" method="POST">
+                    <input type="hidden" name="title" id="title" value="{{book.title}}">
+                    <input type="hidden" name="author" id="author" value="{{book.authors}}">
+                    <button type="submit" class="reviewBtn">Find Review</button>
+            </form>
+    </div>
+</div>

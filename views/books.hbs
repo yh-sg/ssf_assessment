@@ -1,3 +1,6 @@
+<a href="/">Home</a>
+<br>
+
 <h1>Letter {{letter}}</h1>
 
 {{#if empty}}
@@ -6,17 +9,19 @@
 {{else}}
 
 {{#each book}}
-<li><a href="/tvshow/{{this.book_id}}">{{this.title}}</a></li>
+    <li><a href="/book/{{this.book_id}}">{{this.title}}</a></li>
 {{/each}}
 
-<form action="/books/{{letter}}" method="get">
-        <input type="hidden" name="offset" value={{prevOffset}}>
-        <button type="submit">Previous</button>
-</form>
+<div class="d-flex flex-row bd-highlight mb-3 justify-content-between">
+    <form action="/books/{{letter}}" method="get">
+            <input type="hidden" name="offset" value={{prevOffset}}>
+            <button type="submit">Previous</button>
+    </form>
 
-<form action="/books/{{letter}}" method="get">
-        <input type="hidden" name="offset" value={{nextOffset}}>
-        <button type="submit">Next</button>
-</form>
+    <form action="/books/{{letter}}" method="get">
+            <input type="hidden" name="offset" value={{nextOffset}}>
+            <button type="submit">Next</button>
+    </form>
+</div>
 
 {{/if}}
